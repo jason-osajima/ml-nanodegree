@@ -1,6 +1,6 @@
 # Project 0: Introduction and Fundamentals
 ## Titanic Survival Exploration
-titanic_survival_exploration is my solution to Project 0 of the Udacity Machine Learning Engineer Nanodegree. 
+titanic_survival_exploration is my solution to Project 0 of the Udacity Machine Learning Engineer Nanodegree. The goal of the project was to build a decision tree algorithm that could predict whether a passenger survived the titanic. I explored three features ('sex', 'income', 'age') and created a decision tree based on criteria from the three features.
 
 ## Project Overview
 In this project, you will create decision functions that attempt to predict survival outcomes from the 1912 Titanic disaster 
