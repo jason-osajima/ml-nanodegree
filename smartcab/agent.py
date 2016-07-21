@@ -3,6 +3,22 @@ from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
 
+class QTable(object):
+    """A table that an agent uses to look up q-values for different state/action pairs."""
+    def __init__(self):
+        self.Q_table = {}
+
+    def set(self, state, action, q):
+        #sets a new q_value for a given state and action pair.
+        k = (state, action)
+        self.Q_table[k] = q
+
+    def get(self, state, action):
+        #gets a q_value for a corresponding state and action pair.
+        k = (state, action)
+        return self.Q_table[k, None] 
+
+
 class LearningAgent(Agent):
     """An agent that learns to drive in the smartcab world."""
 
@@ -11,8 +27,12 @@ class LearningAgent(Agent):
         self.color = 'black'  # override color
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
         # TODO: Initialize any additional variables here
-        #self.next_waypoint = None
-        #self.total_reward = 0
+        self.epsilon = 0.1
+        self.alpha = 0.5
+        self.gamma = 0.8
+        #initialize the Q_table
+        self.Q_table = QTable()
+
 
     def reset(self, destination=None):
         self.planner.route_to(destination)
@@ -27,7 +47,7 @@ class LearningAgent(Agent):
         deadline = self.env.get_deadline(self)
 
         # TODO: Update state
-
+        self.state = (waypoint, inputs['light'], inputs['oncoming'], inputs['left'])
         
         # TODO: Select action according to your policy
         action = random.choice(Environment.valid_actions)
