@@ -27,7 +27,7 @@ class LearningAgent(Agent):
         self.color = 'black'  # override color
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
         # TODO: Initialize any additional variables here
-        self.epsilon = 0.1
+        self.actions = Environment.valid_actions
         self.alpha = 0.5
         self.gamma = 0.8
         #initialize the Q_table
@@ -38,7 +38,15 @@ class LearningAgent(Agent):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
         self.state = None
+        self.next_state = None
         self.next_waypoint = None
+
+    def choose_action(self, state):
+        q = [self.Q_table.get(state, a) for a in self.actions]
+        maxQ = max(q)
+        action = self.actions[maxQ]
+        return action
+
 
     def update(self, t):
         # Gather inputs
@@ -47,15 +55,19 @@ class LearningAgent(Agent):
         deadline = self.env.get_deadline(self)
 
         # TODO: Update state
-        self.state = (waypoint, inputs['light'], inputs['oncoming'], inputs['left'])
+        self.state = (inputs['light'], inputs['oncoming'], inputs['left'], self.next_waypoint)
         
         # TODO: Select action according to your policy
-        action = random.choice(Environment.valid_actions)
+        action = choose_action(self.state)
 
         # Execute action and get reward
         reward = self.env.act(self, action)
 
         # TODO: Learn policy based on state, action, reward
+        self.next_state = (inputs['light'], inputs['oncoming'], inputs['left'], self.next_waypoint)
+        
+
+
 
         print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 
