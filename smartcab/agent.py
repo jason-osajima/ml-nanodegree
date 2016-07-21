@@ -47,6 +47,20 @@ class LearningAgent(Agent):
         action = self.actions[maxQ]
         return action
 
+    def update_q_table(self, state, action, reward):
+        new_waypoint = self.planner.next_waypoint()
+        new_inputs = self.env.sense(self)
+        new_state = (new_inputs['light'], new_inputs['oncoming'], new_inputs['left'], new_waypoint)
+        new_action = self.choose_action(new_state)
+        current_q = self.Q_table.get(state, action)
+
+        #Use q learning equation to update q value for given state, action pair for the q_table.
+        new_q = current_q + self.alpha * (reward + self.gamma * (max(self.Q_table.get(new_state, new_action))) - current_q)
+        
+        #set the new_q in the q_table for the given state and action.
+        self.Q_table.set(state, action, new_q)
+
+
 
     def update(self, t):
         # Gather inputs
@@ -64,10 +78,7 @@ class LearningAgent(Agent):
         reward = self.env.act(self, action)
 
         # TODO: Learn policy based on state, action, reward
-        self.next_state = (inputs['light'], inputs['oncoming'], inputs['left'], self.next_waypoint)
-        
-
-
+        self.update_q_table(self.state, action, reward)
 
         print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 
