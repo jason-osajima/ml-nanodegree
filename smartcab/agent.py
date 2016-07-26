@@ -49,6 +49,8 @@ class LearningAgent(Agent):
         
         # TODO: Select action according to your policy
         best_action = None
+        
+        #Exploration
         if random.random() <= self.epsilon:
             best_action = random.choice(valid_actions)
             if (state, best_action) not in self.Q.keys():
@@ -77,7 +79,13 @@ class LearningAgent(Agent):
         reward = self.env.act(self, action)
 
         # TODO: Learn policy based on state, action, reward
-        self.update_q_table(self.state, action, reward)
+        if self.prev_state != None:
+            self.Q[(prev_state,prev_action)] = (1-self.alpha)*self.Q[(prev_state,prev_action)] + self.alpha(prev_reward + self.gamma*(self.Q[(prev_state, prev_action)]))
+
+        #Update previous state, action, and reward
+        self.prev_action = action
+        self.prev_state = state
+        self.prev_reward = reward
 
         print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 
