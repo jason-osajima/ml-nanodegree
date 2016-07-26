@@ -4,24 +4,6 @@ from planner import RoutePlanner
 from simulator import Simulator
 from collections import defaultdict
 
-class QTable(object):
-    """A table that an agent uses to look up q-values for different state/action pairs."""
-    def __init__(self):
-        self.Q_table = defaultdict(int)
-
-    def set(self, state, action, q):
-        #sets a new q_value for a given state and action pair.
-        k = (state, action)
-        self.Q_table[k] = q
-
-    def get(self, state, action):
-        #gets a q_value for a corresponding state and action pair.
-        k = (state, action)
-        if self.Q_table[k] is None:
-            self.Q_table[k] = 0
-        return self.Q_table.get(k, None) 
-
-
 class LearningAgent(Agent):
     """An agent that learns to drive in the smartcab world."""
 
@@ -31,8 +13,9 @@ class LearningAgent(Agent):
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
         # TODO: Initialize any additional variables here
         self.actions = Environment.valid_actions
-        self.alpha = 0.5
-        self.gamma = 0.8
+        self.alpha = 0.1
+        self.gamma = 0.9
+        self.epsilon = 0.1
         #initialize the Q_table
         self.Q_table = QTable()
 
@@ -44,33 +27,6 @@ class LearningAgent(Agent):
         self.next_state = None
         self.next_waypoint = None
 
-    def choose_action(self, state):
-        q = [self.Q_table.get(state, a) for a in self.actions]
-        maxQ = max(q)
-        if isinstance( maxQ, ( int, long ) ):
-            action = self.actions[maxQ]
-        else:
-            action = random.choice(self.actions)
-        return action
-
-    def update_q_table(self, state, action, reward):
-        new_waypoint = self.planner.next_waypoint()
-        new_inputs = self.env.sense(self)
-        new_state = (new_inputs['light'], new_inputs['oncoming'], new_inputs['left'], new_waypoint)
-        new_action = self.choose_action(new_state)
-        current_q = self.Q_table.get(state, action)
-        
-        possible_new_q = [self.Q_table.get(new_state, a) for a in new_state]
-
-
-        #Use q learning equation to update q value for given state, action pair for the q_table.
-        new_q = current_q + self.alpha * (reward + self.gamma * (max(possible_new_q)) - current_q)
-        
-        #set the new_q in the q_table for the given state and action.
-        self.Q_table.set(state, action, new_q)
-
-
-
     def update(self, t):
         # Gather inputs
         self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
@@ -78,6 +34,7 @@ class LearningAgent(Agent):
         deadline = self.env.get_deadline(self)
 
         # TODO: Update state
+        self.state = (self.next_waypoint)
         self.state = (inputs['light'], inputs['oncoming'], inputs['left'], self.next_waypoint)
         
         # TODO: Select action according to your policy
@@ -102,7 +59,7 @@ def run():
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.001, display=True)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.00001, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     sim.run(n_trials=100)  # run for a specified number of trials
@@ -113,3 +70,5 @@ def run():
 
 if __name__ == '__main__':
     run()
+
+
