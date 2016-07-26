@@ -11,21 +11,28 @@ class LearningAgent(Agent):
         super(LearningAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
         self.color = 'black'  # override color
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
-        # TODO: Initialize any additional variables here
-        self.actions = Environment.valid_actions
+        valid_actions = Environment.valid_actions
+
+        # Intializing previous action, state, reward.
+        self.prev_action = None
+        self.prev_state = None
+        self.prev_reward = None
+        
+        #initialize the Q_table
+        self.Q = {}
+
+        #Parameters for Q-Learning
         self.alpha = 0.1
         self.gamma = 0.9
         self.epsilon = 0.1
-        #initialize the Q_table
-        self.Q_table = QTable()
-
+        self.default_Q = 0
 
     def reset(self, destination=None):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
-        self.state = None
-        self.next_state = None
-        self.next_waypoint = None
+        self.prev_action = None
+        self.prev_state = None
+        self.prev_reward = None
 
     def update(self, t):
         # Gather inputs
@@ -33,14 +40,40 @@ class LearningAgent(Agent):
         inputs = self.env.sense(self)
         deadline = self.env.get_deadline(self)
 
-        # TODO: Update state
-        self.state = (self.next_waypoint)
-        self.state = (inputs['light'], inputs['oncoming'], inputs['left'], self.next_waypoint)
+        #Update inputs to include all relevant variables (next_waypoint, status, light, left)
+        inputs['waypoint'] = self.next_waypoint
+        del inputs['right']
+
+        #Convert dictionary values of inputs into tuple to reflect state.
+        state = tuple(inputs.values())
         
         # TODO: Select action according to your policy
-        action = self.choose_action(self.state)
+        best_action = None
+        if random.random() <= self.epsilon:
+            best_action = random.choice(valid_actions)
+            if (state, best_action) not in self.Q.keys():
+                self.Q[(state, best_action)] = self.default_Q
+            Q_value = self.Q[(state, best_action)]
+        
+        else:
+            Q_values = []
+            for action in valid_actions:
+                if (state, action) not in self.Q.keys():
+                    self.Q[(state, action)] = self.default_Q
+                Q_values += self.Q[(state, action)]
+
+            #Find best_action and Q_value
+            max_Q = max(Q_values)
+            index = []
+            for i, x in enumerate(Q_values):
+                if x == max(Q_values):
+                    index += i
+            i = random.choice(index)
+            best_action = valid_actions[i]
+            Q_value = Q_values[i]
 
         # Execute action and get reward
+        action = best_action
         reward = self.env.act(self, action)
 
         # TODO: Learn policy based on state, action, reward
