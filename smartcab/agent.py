@@ -11,7 +11,7 @@ class LearningAgent(Agent):
         super(LearningAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
         self.color = 'black'  # override color
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
-        valid_actions = Environment.valid_actions
+        self.valid_actions = Environment.valid_actions
 
         # Intializing previous action, state, reward.
         self.prev_action = None
@@ -22,8 +22,8 @@ class LearningAgent(Agent):
         self.Q = {}
 
         #Parameters for Q-Learning
-        self.alpha = 0.1
-        self.gamma = 0.9
+        self.alpha = 0.9
+        self.gamma = 0.2
         self.epsilon = 0.1
         self.default_Q = 0
 
@@ -52,26 +52,26 @@ class LearningAgent(Agent):
         
         #Exploration
         if random.random() <= self.epsilon:
-            best_action = random.choice(valid_actions)
+            best_action = random.choice(self.valid_actions)
             if (state, best_action) not in self.Q.keys():
                 self.Q[(state, best_action)] = self.default_Q
             Q_value = self.Q[(state, best_action)]
         
         else:
             Q_values = []
-            for action in valid_actions:
+            for action in self.valid_actions:
                 if (state, action) not in self.Q.keys():
                     self.Q[(state, action)] = self.default_Q
-                Q_values += self.Q[(state, action)]
+                Q_values.append(self.Q[(state, action)])
 
             #Find best_action and Q_value
             max_Q = max(Q_values)
             index = []
             for i, x in enumerate(Q_values):
                 if x == max(Q_values):
-                    index += i
+                    index.append(i)
             i = random.choice(index)
-            best_action = valid_actions[i]
+            best_action = self.valid_actions[i]
             Q_value = Q_values[i]
 
         # Execute action and get reward
@@ -80,7 +80,7 @@ class LearningAgent(Agent):
 
         # TODO: Learn policy based on state, action, reward
         if self.prev_state != None:
-            self.Q[(prev_state,prev_action)] = (1-self.alpha)*self.Q[(prev_state,prev_action)] + self.alpha(prev_reward + self.gamma*(self.Q[(prev_state, prev_action)]))
+            self.Q[(self.prev_state,self.prev_action)] = (1-self.alpha)*self.Q[(self.prev_state,self.prev_action)] + self.alpha*(self.prev_reward + self.gamma*(self.Q[(state, action)]))
 
         #Update previous state, action, and reward
         self.prev_action = action
@@ -100,7 +100,7 @@ def run():
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.00001, display=True)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.0000001, display=False)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     sim.run(n_trials=100)  # run for a specified number of trials
