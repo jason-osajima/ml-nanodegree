@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  26 JUL 2016 20:45
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  27 JUL 2016 17:50
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -381,34 +381,18 @@ Underfull \hbox (badness 10000) in paragraph at lines 71--72
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 73--74
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 75--76
-
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 77--78
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 81--82
+Underfull \hbox (badness 10000) in paragraph at lines 79--80
 
  []
 
 [4]
-Underfull \hbox (badness 10000) in paragraph at lines 83--84
+Underfull \hbox (badness 10000) in paragraph at lines 81--82
 
- []
-
-
-Overfull \hbox (11.7226pt too wide) in paragraph at lines 85--86
-[]\OT1/cmr/m/n/10.95 After im-ple-ment-ing q-learning and set-ting ini-tial pa-
-ram-e-ters ar-bi-trar-ily (copied
  []
 
 
@@ -417,22 +401,33 @@ Underfull \hbox (badness 10000) in paragraph at lines 85--86
  []
 
 
-Overfull \hbox (15.74132pt too wide) in paragraph at lines 89--97
+Underfull \hbox (badness 10000) in paragraph at lines 87--88
+
+ []
+
+
+Overfull \hbox (11.7226pt too wide) in paragraph at lines 89--90
+[]\OT1/cmr/m/n/10.95 After im-ple-ment-ing q-learning and set-ting ini-tial pa-
+ram-e-ters ar-bi-trar-ily (copied
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 89--90
+
+ []
+
+
+Overfull \hbox (15.74132pt too wide) in paragraph at lines 93--101
 [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 89--97
+Underfull \hbox (badness 10000) in paragraph at lines 93--101
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 89--97
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 98--99
+Underfull \hbox (badness 10000) in paragraph at lines 93--101
 
  []
 
@@ -442,12 +437,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 102--103
  []
 
 [5]
-Underfull \hbox (badness 10000) in paragraph at lines 110--111
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 112--113
+Underfull \hbox (badness 10000) in paragraph at lines 106--107
 
  []
 
@@ -457,27 +447,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 114--115
  []
 
 
-Overfull \hbox (15.74132pt too wide) in paragraph at lines 118--128
+Underfull \hbox (badness 10000) in paragraph at lines 116--117
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 118--119
+
+ []
+
+
+Overfull \hbox (15.74132pt too wide) in paragraph at lines 122--132
 [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 118--128
+Underfull \hbox (badness 10000) in paragraph at lines 122--132
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 118--128
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 129--130
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 131--132
+Underfull \hbox (badness 10000) in paragraph at lines 122--132
 
  []
 
@@ -487,53 +477,63 @@ Underfull \hbox (badness 10000) in paragraph at lines 133--134
  []
 
 
-./Project 4 - Smartcab.tex:154: LaTeX Error: There's no line here to end.
+Underfull \hbox (badness 10000) in paragraph at lines 135--136
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 137--138
+
+ []
+
+
+./Project 4 - Smartcab.tex:158: LaTeX Error: There's no line here to end.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.154 
+l.158 
       
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
 
-./Project 4 - Smartcab.tex:156: LaTeX Error: There's no line here to end.
+./Project 4 - Smartcab.tex:160: LaTeX Error: There's no line here to end.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.156 
+l.160 
       
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 157--158
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 159--160
-
- []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 161--162
 
  []
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 163--164
+
+ []
+
 [7]
+Underfull \hbox (badness 10000) in paragraph at lines 165--166
+
+ []
+
+[8]
 (/Users/Jason/Desktop/Projects/udacity_projects/smartcab/.texpadtmp/Project 4 -
  Smartcab.aux) ) 
 Here is how much of TeX's memory you used:
  1674 strings out of 493089
  22931 string characters out of 6134842
- 99018 words of memory out of 5000000
+ 100018 words of memory out of 5000000
  5177 multiletter control sequences out of 15000+600000
  8609 words of font info for 31 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -544,10 +544,10 @@ cm/cmr10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm
 /cmsy10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/
 cmti10.pfb>
 Output written on "/Users/Jason/Desktop/Projects/udacity_projects/smartcab/.tex
-padtmp/Project 4 - Smartcab.pdf" (7 pages, 77972 bytes).
+padtmp/Project 4 - Smartcab.pdf" (8 pages, 78897 bytes).
 PDF statistics:
- 44 PDF objects out of 1000 (max. 8388607)
- 30 compressed objects within 1 object stream
+ 47 PDF objects out of 1000 (max. 8388607)
+ 32 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -70,11 +70,15 @@ I identified four relevant state variables:
 
 The actions are: [None, ‘forward’, ‘left’, ‘right’]\\
 
-The other state variables are traffic to the right and deadline. I chose to ignore traffic to the right because it won’t affect the agent’s actions. Traffic to the right has four states: [None, ‘forward’, ‘left’, ‘right’]. If traffic to the right is None, it has no effect on the agent. If traffic to the right is ‘forward’ or ‘left', the light will be red for the agent and the agent won’t be affected. If traffic to the right is ‘right’, the agent has the right of way and can go ‘forward’, ‘right’, or ‘left.'\\
+I selected direction of next waypoint in order for the agent to prioritize reaching the destination instead of randomly selecting actions. I decided to use light status so the agent would learn to stop when the light is red. This will prevent the agent from going forward and breaking traffic rules and potentially crashing into another car. I determined that the state variables oncoming traffic and traffic to the left are also relevant to prevent the agent from running into another car and receiving a penalty.
+
+The other state variables are traffic to the right and deadline. I chose to ignore traffic to the right because it won’t affect the agent’s actions. Traffic to the right has four states: [None, ‘forward’, ‘left’, ‘right’]. If traffic to the right is None, it has no effect on the agent. If traffic to the right is ‘forward’ or ‘left', the light will be red for the agent and the agent won’t be affected. If traffic to the right is ‘right’, the agent has the right of way and can go ‘forward’, ‘right’, or ‘left.'
+
+I also decided to omit deadline. While the deadline state variable would be useful for the smartcab to use when making decisions, I felt that using deadline would increase the set of possible states exponentially and decrease the effectiveness of Q-Learning for a limited amount of trials.\\
 
 \textit{How many states in total exist for the smartcab in this environment? Does this number seem reasonable given that the goal of Q-Learning is to learn and make informed decisions about each state? Why or why not?}\\
 
-In total, there are 6 state variables, and 4*2*4*4*4 = 256 different states. This number seems too large, since Q-Learning will need to iterate through each of the 256 states multiple times to determine which ones are optimal to getting to the destination, and therefore it will take a long time to learn.\\
+In total, I chose 4 state variables, which means there are 4*2*4*4 = 128 different states. This number seems reasonable, since Q-Learning can iterate through each of the 128 states many times in 100 trials to determine which ones are optimal to getting to the destination.\\
 
 \section{Implement a Q-Learning Driving Agent}
 
