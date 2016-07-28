@@ -30,6 +30,8 @@ class LearningAgent(Agent):
     def reset(self, destination=None):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
+        self.state = None
+        self.next_waypoint = None
         self.prev_action = None
         self.prev_state = None
         self.prev_reward = None
@@ -44,7 +46,8 @@ class LearningAgent(Agent):
         inputs['waypoint'] = self.next_waypoint
         del inputs['right']
 
-        #Convert dictionary values of inputs into tuple to reflect state.
+        #Convert dictionary values of inputs into tuple to reflect state
+        self.state = inputs
         state = tuple(inputs.values())
         
         # TODO: Select action according to your policy
@@ -100,10 +103,10 @@ def run():
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.0000001, display=False)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.0000001, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
-    sim.run(n_trials=100)  # run for a specified number of trials
+    sim.run(n_trials=1)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
 
 
