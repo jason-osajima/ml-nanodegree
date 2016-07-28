@@ -22,10 +22,10 @@ class LearningAgent(Agent):
         self.Q = {}
 
         #Parameters for Q-Learning
-        self.alpha = 0.95
-        self.gamma = 0.55
+        self.alpha = 0.85
+        self.gamma = 0.45
         self.epsilon = 0.001
-        self.default_Q = 20
+        self.default_Q = 10
 
     def reset(self, destination=None):
         self.planner.route_to(destination)
