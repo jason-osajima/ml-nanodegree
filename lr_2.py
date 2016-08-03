@@ -24,6 +24,22 @@ layers = 4
 num_steps = 20001
 batch_size = 128
 
+# Function that we can use to measure accuracy
+def accuracy(predictions, labels):
+    return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1))
+          / predictions.shape[0])
+
+
+#Initiate an array for every 50 steps
+steps = np.arange(0,num_steps,50)
+#Initiate a list of arrays for loss for every 50 steps. 
+loss1 = np.zeros((num_steps-1)/50+1)
+loss2 = np.zeros((num_steps-1)/50+1)
+loss3 = np.zeros((num_steps-1)/50+1)
+
+loss_list = [loss1, loss2, loss3]
+
+
 graph = tf.Graph()
 with graph.as_default():
 
@@ -62,24 +78,6 @@ with graph.as_default():
     optimizer2 = tf.train.GradientDescentOptimizer(0.8).minimize(loss)
     optimizer3 = tf.train.GradientDescentOptimizer(0.5).minimize(loss)
     optimizer = [optimizer1, optimizer2, optimizer3]
-
-# Function that we can use to measure accuracy
-def accuracy(predictions, labels):
-    return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1))
-          / predictions.shape[0])
-
-
-#Initiate an array for every 50 steps
-steps = np.arange(0,num_steps,50)
-#Initiate a list of arrays for loss for every 50 steps. 
-loss1 = np.zeros((num_steps-1)/50+1)
-loss2 = np.zeros((num_steps-1)/50+1)
-loss3 = np.zeros((num_steps-1)/50+1)
-
-loss_list = [loss1, loss2, loss3]
-    
-with graph.as_default():
-
     
 for i in range(3):
     with tf.Session(graph=graph) as session:
@@ -87,9 +85,9 @@ for i in range(3):
         print ("Initialized")
         for step in xrange(num_steps):
             # Pick an offset within the training data, which has been randomized.
-            offset = (step * batch_size) % (X_train_norm.shape[0] - batch_size)
+            offset = (step * batch_size) % (X_train.shape[0] - batch_size)
             # Generate a minibatch.
-            batch_data = X_train_norm[offset:(offset + batch_size), :]
+            batch_data = X_train[offset:(offset + batch_size), :]
             batch_labels = y_train[offset:(offset + batch_size), :]
             # Prepare a dictionary telling the session where to feed the minibatch.
             # The key of the dictionary is the placeholder node of the graph to be fed,
