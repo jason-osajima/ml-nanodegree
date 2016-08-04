@@ -100,7 +100,7 @@ for i in range(3):
 
 
 h5f = h5py.File('lr_2_data.h5', 'w')
-h5f.create_dataset('loss1', data=loss_list[i])
-h5f.create_dataset('loss2', data=loss_list[i])
-h5f.create_dataset('loss3', data=loss_list[i])
+h5f.create_dataset('loss1', data=loss1)
+h5f.create_dataset('loss2', data=loss2)
+h5f.create_dataset('loss3', data=loss3)
 h5f.close()
