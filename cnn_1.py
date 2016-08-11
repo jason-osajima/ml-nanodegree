@@ -5,7 +5,7 @@ import time
 import numpy as np
 
 #Load the data
-h5f = h5py.File('cnn-sat-6.h5','r')
+h5f = h5py.File('sat-6.h5','r')
 
 X_train = h5f['X_train'][:]
 y_train = h5f['y-train'][:]
@@ -16,119 +16,128 @@ y_valid = h5f['y_valid'][:]
 
 h5f.close()
 
-#number of land_cover labels
+#land_cover labels
 land_cover = ['buildings', 'barren_land', 'trees', 'grassland', 'roads', 'water_bodies']
-num_labels = len(land_cover)
-image_size = 28
-layers = 4
-num_steps = 100001
+
+#Parameters
+learning_rate = 0.001
+training_iters = 200000
 batch_size = 128
+display_step = 10
 
-beta = 0.01
-alpha = 1e-4
+#Network Parameters
+n_input = 3136 #Image data input (28*28*4)
+n_classes = len(land_cover)
+dropout = 0.75
 
-graph = tf.Graph()
-with graph.as_default():
+#tf graph input
+x = tf.placeholder(tf.float32, [None, n_input])
+y = tf.placeholder(tf.float32, [None, n_classes]) 
+keep_prob = tf.placeholder(tf.float32) #dropout (keep probability)
 
-    #functions to initialize weights and biases.
-    def weight_variable(shape):
-        initial = tf.truncated_normal(shape, stddev=0.1)
-        return tf.Variable(initial)
+#create wrappers
+def conv2d(x, W, b, strides = 1):
+    #conv2d wrapper, with bias and relu activation
+    x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME')
+    x = tf.nn.bias_add(x, b)
+    return tf.nn.relu(x)
 
-    def bias_variable(shape):
-        initial = tf.constant(0.1, shape=shape)
-        return tf.Variable(initial)
-    
-    #functions to initialize convolutions and max pooling.
-    def conv2d(x, W):
-        return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+def maxpool2d(x, k=2):
+    #maxpool 2D wrapper
+    return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1], padding='SAME')
 
-    def max_pool_2x2(x):
-        return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
+#create model
+def conv_net(x, weights, biases, dropout):
+    # Reshape input picture
+    x = tf.reshape(x, shape=[-1, 28, 28, 4])
+    #Convolution Layer
+    conv1 = conv2d(x, weights['wc1'], biases['bc1'])
+    #max pooling
+    conv1 = maxpool2d(conv1, k=2)
 
-    #Placeholders for the input images and output target classes.
-    X = tf.placeholder(tf.float32, shape=[None, 28, 28, 4])
-    y_ = tf.placeholder(tf.float32, shape=[None, 6])
-    
-    # First convolutional layer.
-    # Reshape x to a 4d tensor.
-    x_image = tf.reshape(X, [-1,28,28,4])
-    # Set the variables.
-    W_conv1 = weight_variable([5, 5, 4, 32])
-    b_conv1 = bias_variable([32])
-    # Perform convolution and max-pooling.
-    h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-    h_pool1 = max_pool_2x2(h_conv1)
-    
-    
-    # Second convolutional layer.
-    # Set the variables.
-    W_conv2 = weight_variable([5, 5, 32, 64])
-    b_conv2 = bias_variable([64])
-    # Perform convolution and max-pooling.
-    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-    h_pool2 = max_pool_2x2(h_conv2)
-    
-    
-    # Densely connected layer.
-    # Set the variables.
-    W_fc1 = weight_variable([7 * 7 * 64, 512])
-    b_fc1 = bias_variable([512])
-    #Perform matrix multiplication, add a bias, and put it through the ReLu.
-    h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
-    h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
-    
-    
-    #Add Dropout
-    keep_prob = tf.placeholder(tf.float32)
-    h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
-    
-    
-    #Add softmax.
-    W_fc2 = weight_variable([512, 6])
-    b_fc2 = bias_variable([6])
-    z_fc2 = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-    y_conv=tf.nn.softmax(z_fc2)
-    
-    
-    #Introduce regularization with parameter beta. 
-    #Calculate the loss with regularization.
-    loss = tf.reduce_mean(
-        tf.nn.softmax_cross_entropy_with_logits(z_fc2, y_))
-    loss = loss + beta * tf.nn.l2_loss(W_fc2)
-    
-    
-    #optimizer
-    ada_optimizer = tf.train.AdagradOptimizer(alpha).minimize(loss)
-    
-    #accuracy
-    correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    #Convolution Layer
+    conv2 = conv2d(conv1, weights['wc2'], biases['bc2'])
+    #max pooling
+    conv2 = maxpool2d(conv2, k=2)
 
-with tf.Session(graph=graph) as session:
-    tf.initialize_all_variables().run()
-    print ("Initialized")
-    start = time.time()
+    #fully connected layer
+    #reshape conv2 output to fit fully connected layer input
+    fc1 = tf.reshape(conv2, [-1, weights['wd1'].get_shape().as_list()[0]])
+    fc1 = tf.add(tf.matmul(fc1, weights['wd1']), biases['bd1'])
+    fc1 = tf.nn.relu(fc1)
+    #apply droupout
+    fc1 = tf.nn.dropout(fc1, dropout)
     
-    for i in xrange(num_steps):
-        #Create an offset
-        offset = (i * batch_size) % (X_train.shape[0] - batch_size)
+    #output, class prediction
+    out = tf.add(tf.matmul(fc1, weights['out']), biases['out'])
+    
+    return out
+
+#store layer weights and biases
+weights = {
+    #5 x 5 conv, 4 inputs, 32 outputs
+    'wc1': tf.Variable(tf.random_normal([5,5,4,32])),
+    #5 x 5 conv, 32 inputs, 64 outputs
+    'wc2': tf.Variable(tf.random_normal([5,5,32,64])),
+    #fully connected, 7*7*64 inputs, 1024 outputs
+    'wd1': tf.Variable(tf.random_normal([7*7*64, 1024])),
+    #1024 inputs, 6 outputs (class prediction)
+    'out' : tf.Variable(tf.random_normal([1024, n_classes]))
+}
+
+biases = {
+    'bc1': tf.Variable(tf.random_normal([32])),
+    'bc2': tf.Variable(tf.random_normal([64])),
+    'bd1': tf.Variable(tf.random_normal([1024])),
+    'out': tf.Variable(tf.random_normal([n_classes]))
+}
+
+#construct model
+pred = conv_net(x, weights, biases, keep_prob)
+
+#define loss and optimizer
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
+optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate).minimize(cost)
+
+#evaluate model
+correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y,1))
+accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+
+
+# Evaluate model
+correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+
+# Initializing the variables
+init = tf.initialize_all_variables()
+
+# Launch the graph
+with tf.Session() as sess:
+    sess.run(init)
+    step = 1
+    # Keep training until reach max iterations
+    while step * batch_size < training_iters:
+        # Pick an offset within the training data, which has been randomized.
+        offset = (step * batch_size) % (X_train.shape[0] - batch_size)
+        
         # Generate a minibatch.
         batch_data = X_train[offset:(offset + batch_size), :]
         batch_labels = y_train[offset:(offset + batch_size), :]
-        if i%1000 == 0:
-            train_accuracy = accuracy.eval(feed_dict={
-                    X:batch_data, y_: batch_labels, keep_prob: 1.0})
-            valid_accuracy = accuracy.eval(feed_dict={
-                    X:X_valid, y_: y_valid, keep_prob: 1.0})
         
-        print("step %d, training accuracy %g and loss %g"%(i, train_accuracy))
-        print("step %d, cross validation accuracy %g"%(i, valid_accuracy))
-        print("------------------------------------------")
+        # Run optimization op (backprop)
+        sess.run(optimizer, feed_dict={x: batch_data, y: batch_labels,
+                                       keep_prob: dropout})
+        if step % display_step == 0:
+            # Calculate batch loss and accuracy
+            loss, acc = sess.run([cost, accuracy], feed_dict={x: batch_data, y: batch_labels, keep_prob: 1.})
+            print "Iter " + str(step*batch_size) + ", Minibatch Loss= " + \
+                  "{:.6f}".format(loss) + ", Training Accuracy= " + \
+                  "{:.5f}".format(acc)
+        step += 1
+    print "Optimization Finished!"
 
-        ada_optimizer.run(feed_dict={x: batch_data, y_: batch_labels, keep_prob: 0.5})
-
-    print("test accuracy %g"%accuracy.eval(feed_dict={
-        x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
-
+    # Calculate accuracy
+    print "Testing Accuracy:", \
+        sess.run(accuracy, feed_dict={x: X_valid,
+                                      y: y_valid,
+                                      keep_prob: 1.})
