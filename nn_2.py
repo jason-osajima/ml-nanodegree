@@ -29,10 +29,13 @@ def accuracy(predictions, labels):
     return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1))
           / predictions.shape[0])
 
-batch_size = 128
-n_hidden_nodes = 100
+#Initiate an array for every 50 steps
+steps = np.arange(0,num_steps,50)
+#Initiate a list of arrays for loss for every 50 steps. 
+nn_loss1 = np.zeros((num_steps-1)/50+1)
 
-# batch_size = 128
+# parameters
+batch_size = 128
 n_hidden_nodes = 100
 beta = 0.01
 alpha = 0.001
@@ -50,27 +53,15 @@ with graph.as_default():
         return tf.Variable(initial)
     
     #Placeholders for the input images and output target classes.
-    X = tf.placeholder(tf.float32, shape=[None, 3136])
-    y_ = tf.placeholder(tf.float32, shape=[None, 6])
+    tf_X_train = tf.placeholder(tf.float32, shape=[None, 3136])
+    tf_y_train = tf.placeholder(tf.float32, shape=[None, 6])
+    tf_X_valid = tf.constant(X_valid)
+    tf_X_test = tf.constant(X_test)
     
     #A placeholder for the probability that a neuron's output is kept during dropout.
     keep_prob = tf.placeholder(tf.float32)
     
     
-    # First hidden layer.
-    # Set the variables.
-    W_1 = weight_variable([3136, n_hidden_nodes])
-    b_1 = bias_variable([1, n_hidden_nodes])
-    
-    #Perform matrix multiplication, add bias, and put it through the ReLu 
-    z1 = tf.matmul(X, W_1)+b_1
-    h1 = tf.nn.relu(z1)
-    
-    
-    
-    #A placeholder for the probability that a neuron's output is kept during dropout.
-    keep_prob = tf.placeholder(tf.float32)
-  
     # Variables. We initialize a set of weights and biases for the two layers of our neural network.
     # Weights_01 is a 3136 x 100 matrix.
     weights_01 = tf.Variable(tf.truncated_normal([image_size * image_size * layers, n_hidden_nodes]))
@@ -110,9 +101,9 @@ with tf.Session(graph=graph) as session:
     start = time.time()
     for step in xrange(num_steps):
         # Pick an offset within the training data, which has been randomized.
-        offset = (step * batch_size) % (X_train_norm.shape[0] - batch_size)
+        offset = (step * batch_size) % (X_train.shape[0] - batch_size)
         # Generate a minibatch.
-        batch_data = X_train_norm[offset:(offset + batch_size), :]
+        batch_data = X_train[offset:(offset + batch_size), :]
         batch_labels = y_train[offset:(offset + batch_size), :]
         # Prepare a dictionary telling the session where to feed the minibatch.
         # The key of the dictionary is the placeholder node of the graph to be fed,
@@ -120,11 +111,12 @@ with tf.Session(graph=graph) as session:
         feed_dict = {tf_X_train : batch_data, tf_y_train : batch_labels, keep_prob: 0.5}
         _, l, predictions = session.run(
           [ada_optimizer, loss, train_prediction], feed_dict=feed_dict)
-        if (step % 1000 == 0):
-            print ("Minibatch loss at step", step, ":", l)
-            print ("Training accuracy: %.1f%%" % accuracy(train_prediction.eval({tf_X_train : batch_data, 
-                                           tf_y_train : batch_labels, keep_prob: 1.0}), batch_labels))
-            print ("Validation accuracy: %.1f%%" % accuracy(
-                    valid_prediction.eval({keep_prob: 1.0}), y_valid))
-    end = time.time()
-    print ("Training time (secs): {:.5f}".format(end - start))
+        if (step % 50 == 0):
+                nn_loss1[step/50] = l
+
+h5f = h5py.File('nn_2_data.h5', 'w')
+h5f.create_dataset('nn_loss1', data=nn_loss1)
+h5f.close()
+
+
+

@@ -24,14 +24,13 @@ layers = 4
 num_steps = 3001
 batch_size = 128
 
+batch_size = 128
+n_hidden_nodes = 100
+
 # Function that we can use to measure accuracy
 def accuracy(predictions, labels):
     return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1))
           / predictions.shape[0])
-
-batch_size = 128
-n_hidden_nodes = 100
-
 
 graph = tf.Graph()
 with graph.as_default():
@@ -92,3 +91,4 @@ with tf.Session(graph=graph) as session:
                     valid_prediction.eval(), y_valid))
     end = time.time()
     print ("Training time (secs): {:.5f}".format(end - start))
+
