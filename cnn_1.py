@@ -11,8 +11,6 @@ X_train = h5f['X_train'][:]
 y_train = h5f['y-train'][:]
 X_test = h5f['X_test'][:]
 y_test = h5f['y_test'][:]
-X_valid = h5f['X_valid'][:]
-y_valid = h5f['y_valid'][:]
 
 h5f.close()
 
@@ -21,7 +19,7 @@ land_cover = ['buildings', 'barren_land', 'trees', 'grassland', 'roads', 'water_
 
 #Parameters
 learning_rate = 0.001
-training_iters = 200000
+training_iters = 500000
 batch_size = 128
 display_step = 10
 
@@ -92,17 +90,15 @@ biases = {
     'out': tf.Variable(tf.random_normal([n_classes]))
 }
 
+#Initiate a list of arrays for loss for every 50 steps. 
+cnn_loss = np.zeros(training_iters/display_step)
+
 #construct model
 pred = conv_net(x, weights, biases, keep_prob)
 
 #define loss and optimizer
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
 optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate).minimize(cost)
-
-#evaluate model
-correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y,1))
-accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-
 
 # Evaluate model
 correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
@@ -114,6 +110,8 @@ init = tf.initialize_all_variables()
 # Launch the graph
 with tf.Session() as sess:
     sess.run(init)
+    print ("Initialized")
+    start = time.time()
     step = 1
     # Keep training until reach max iterations
     while step * batch_size < training_iters:
@@ -133,11 +131,23 @@ with tf.Session() as sess:
             print "Iter " + str(step*batch_size) + ", Minibatch Loss= " + \
                   "{:.6f}".format(loss) + ", Training Accuracy= " + \
                   "{:.5f}".format(acc)
+            cnn_loss[step/display_step] = loss
         step += 1
+    end = time.time()
     print "Optimization Finished!"
+    print ("Training time (secs): {:.5f}".format(end - start))
+
 
     # Calculate accuracy
+    start = time.time()
     print "Testing Accuracy:", \
-        sess.run(accuracy, feed_dict={x: X_valid,
-                                      y: y_valid,
+        sess.run(accuracy, feed_dict={x: X_test,
+                                      y: y_test,
                                       keep_prob: 1.})
+    end = time.time()
+    print ("Prediction time (secs): {:.5f}".format(end - start))
+
+
+h5f = h5py.File('cnn_1_data.h5', 'w')
+h5f.create_dataset('cnn_loss', data=cnn_loss)
+h5f.close()
