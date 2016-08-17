@@ -14,6 +14,7 @@ This project runs on Python 2.7, along with the following packages:
 * h5py (version 2.6.0)
 * matplotlib (version 1.3.1)
 * scipy (version 0.18.0)
+* sklearn (version 0.17.1)
 
 ## Acknowledgements
 A huge thank you to Saikat Basu et al. for producing an amazing dataset of satellite images 
