@@ -3,14 +3,15 @@ import tensorflow as tf
 import h5py
 import time
 import numpy as np
+import sklearn
 
 #Load the data
 h5f = h5py.File('sat-6.h5','r')
 
 X_train = h5f['X_train'][:]
 y_train = h5f['y-train'][:]
-X_test = h5f['X_test'][:]
-y_test = h5f['y_test'][:]
+X_valid = h5f['X_valid'][:]
+y_valid = h5f['y_valid'][:]
 
 h5f.close()
 
@@ -19,7 +20,7 @@ land_cover = ['buildings', 'barren_land', 'trees', 'grassland', 'roads', 'water_
 
 #Parameters
 learning_rate = 0.001
-training_iters = 500000
+training_iters = 50000
 batch_size = 128
 display_step = 10
 
@@ -101,6 +102,7 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
 optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate).minimize(cost)
 
 # Evaluate model
+y_pred = tf.argmax(pred, 1)
 correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
@@ -139,15 +141,22 @@ with tf.Session() as sess:
 
 
     # Calculate accuracy
-    start = time.time()
-    print "Testing Accuracy:", \
-        sess.run(accuracy, feed_dict={x: X_test,
-                                      y: y_test,
-                                      keep_prob: 1.})
+    start = time.time()    
+    acc, y_pred = sess.run([accuracy, y_pred], feed_dict={x:             X_valid, y: y_valid, keep_prob: 1.})
+    
+    #Calculate f1 and create a confusion matrix
+    y_true = np.argmax(y_valid, 1)
+    f1_score = sklearn.metrics.f1_score(y_true, y_pred, average='weighted')
+    cnn_1_cm = sklearn.metrics.confusion_matrix(y_true, y_pred)
+    print  "Validation Accuracy= " + \
+                  "{:.6f}".format(acc) + ", Validation f1 score= " + \
+                  "{:.5f}".format(f1_score)
+    
     end = time.time()
     print ("Prediction time (secs): {:.5f}".format(end - start))
 
 
 h5f = h5py.File('cnn_1_data.h5', 'w')
 h5f.create_dataset('cnn_loss', data=cnn_loss)
+h5f.create_dataset('cnn_1_cm', data=cnn_1_cm)
 h5f.close()
