@@ -91,9 +91,9 @@ biases = {
     'out': tf.Variable(tf.random_normal([n_classes]))
 }
 
-#Initiate a list of arrays for loss for every 50 steps. 
-cnn_loss = np.zeros(training_iters/display_step)
-
+#Initiate an array to hold steps and loss. 
+cnn_step = np.array([])
+cnn_loss = np.array([])
 #construct model
 pred = conv_net(x, weights, biases, keep_prob)
 
@@ -133,7 +133,9 @@ with tf.Session() as sess:
             print "Iter " + str(step*batch_size) + ", Minibatch Loss= " + \
                   "{:.6f}".format(loss) + ", Training Accuracy= " + \
                   "{:.5f}".format(acc)
-            cnn_loss[step/display_step] = loss
+            cnn_step= np.append(cnn_step, step*batch_size)
+            cnn_loss= np.append(cnn_loss, loss)
+
         step += 1
     end = time.time()
     print "Optimization Finished!"
@@ -158,5 +160,6 @@ with tf.Session() as sess:
 
 h5f = h5py.File('cnn_1_data.h5', 'w')
 h5f.create_dataset('cnn_loss', data=cnn_loss)
+h5f.create_dataset('cnn_step', data=cnn_step)
 h5f.create_dataset('cnn_1_cm', data=cnn_1_cm)
 h5f.close()
