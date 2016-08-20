@@ -10,8 +10,8 @@ h5f = h5py.File('sat-6.h5','r')
 
 X_train = h5f['X_train'][:]
 y_train = h5f['y-train'][:]
-X_valid = h5f['X_valid'][:]
-y_valid = h5f['y_valid'][:]
+X_test = h5f['X_test'][:]
+y_test = h5f['y_test'][:]
 
 h5f.close()
 
@@ -144,14 +144,14 @@ with tf.Session() as sess:
 
     # Calculate accuracy
     start = time.time()    
-    acc, y_pred = sess.run([accuracy, y_pred], feed_dict={x:             X_valid, y: y_valid, keep_prob: 1.})
+    acc, y_pred = sess.run([accuracy, y_pred], feed_dict={x:             X_test, y: y_test, keep_prob: 1.})
     
     #Calculate f1 and create a confusion matrix
-    y_true = np.argmax(y_valid, 1)
+    y_true = np.argmax(y_test, 1)
     f1_score = sklearn.metrics.f1_score(y_true, y_pred, average='weighted')
     cnn_1_cm = sklearn.metrics.confusion_matrix(y_true, y_pred)
-    print  "Validation Accuracy= " + \
-                  "{:.6f}".format(acc) + ", Validation f1 score= " + \
+    print  "Test Accuracy= " + \
+                  "{:.6f}".format(acc) + ", Test f1 score= " + \
                   "{:.5f}".format(f1_score)
     
     end = time.time()
