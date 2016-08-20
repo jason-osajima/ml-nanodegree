@@ -22,7 +22,7 @@ land_cover = ['buildings', 'barren_land', 'trees', 'grassland', 'roads', 'water_
 
 #Parameters
 learning_rate = 0.001
-training_iters = 200
+training_iters = 200000
 batch_size = 128
 display_step = 10
 
@@ -96,6 +96,7 @@ biases = {
 #Initiate an array to hold steps and loss. 
 cnn_2_step = np.array([])
 cnn_2_loss = np.array([])
+
 #construct model
 pred = conv_net(x, weights, biases, keep_prob)
 
